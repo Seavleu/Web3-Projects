@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First dApp</title>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css?family=Roboto:300');
+
+    body {
+        text-align: center;
+        background: linear-gradient(141deg, rgb(181, 178, 178) 25%, #eee 40%, #ddd 55%);
+        color: rgb(107, 99, 99);
+        font-family: 'Roboto';
+        font-weight: 300;
+        font-size: 32px;
+        padding-top: 40vh;
+        height: 100vh;
+        overflow: hidden;
+        -webkit-backface-visibility: hidden;
+        -webkit-perspective: 1000;
+        -webkit-transform: translate3d(0, 0, 0);
+    }
+
+    div {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    div:first-of-type {
+        animation: showup 7s infinite;
+    }
+
+    div:last-of-type {
+        width: 0px;
+        animation: reveal 7s infinite;
+    }
+
+    div:last-of-type span {
+        margin-left: -355px;
+        animation: slidein 7s infinite;
+    }
+
+
+    .btn-12 {
+        border: none;
+        text-align: center;
+        display: inline-block;
+        padding: 15px 40px;
+        cursor: pointer;
+        letter-spacing: 2px;
+        position: relative;
+        overflow: hidden;
+        margin-top: 20px;
+    }
+
+    .btn-12:before {
+        content: "";
+        position: absolute;
+        width: 0;
+        background: rgb(145, 84, 84);
+        left: 45%;
+        height: 2px;
+        bottom: 0;
+        transition: all .3s;
+        opacity: 0.7;
+    }
+
+    .btn-12:hover:before {
+        width: 100%;
+        left: 0;
+    }
+
+    /* Button 12 Bitti */
+
+
+    @keyframes showup {
+        0% {
+            opacity: 0;
+        }
+
+        20% {
+            opacity: 1;
+        }
+
+        80% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes slidein {
+        0% {
+            margin-left: -800px;
+        }
+
+        20% {
+            margin-left: -800px;
+        }
+
+        35% {
+            margin-left: 0px;
+        }
+
+        100% {
+            margin-left: 0px;
+        }
+    }
+
+    @keyframes reveal {
+        0% {
+            opacity: 0;
+            width: 0px;
+        }
+
+        20% {
+            opacity: 1;
+            width: 0px;
+        }
+
+        30% {
+            width: 355px;
+        }
+
+        80% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+            width: 355px;
+        }
+    }
+
+
+    p {
+        font-size: 12px;
+        color: #999;
+        margin-top: 200px;
+    }
+
+    input {
+        font-size: 18px;
+        padding: 10px 10px 10px 5px;
+        display: block;
+        width: 400px;
+        border: none;
+        border-bottom: 1px solid #757575;
+        margin-top: 50px;
+    }
+
+    input:focus {
+        outline: none;
+    }
+</style>
+
+<body>
+
+
+    <label for="mood">Input Mood</label> <br />
+    
+    <div>
+        <input type="text" id="mood" required >
+        <button class="btn-12" onclick="getMood()">Get Mood</button>
+        <button class="btn-12" onclick="setMood()">Set Mood</button>
+    </div>
+    </div>
+    <p>Smart Contract Set Mood on Remix.io <br> using ether.js lib</p>
+</body>
+<!-- This exposes the library as a global variable: ethers -->
+<script src="https://cdn.ethers.io/scripts/ethers-v4.min.js" charset="utf-8" type="text/javascript">
+</script>
+<script>
+    window.ethereum.enable();
+    var provider = new ether.provider.Web3Provider(
+        web3.currentProvider,
+        "goerli"
+    );
+    var MoodContractAddress = "0x482E72b146A0c0cBd3F8b81b45b2C2A63B40DaD5";
+    var MoodContractABI = [
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_mood",
+                    "type": "string"
+                }
+            ],
+            "name": "setMood",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "getMood",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ];
+    var MoodContract;
+    var signer;
+
+    // use signer to get the contract
+    provider.listAccount().then(function (accounts) {
+        signer = provider.getSigner(accounts[0]);
+        MoodContract = new ethers.Contract(
+            MoodContractAddress,
+            MoodContractABI,
+            signer
+        );
+    });
+
+    // async function is to enable to do multi things altogether
+    async function getMood() {
+        getMoodPromise = MoodContract.getMood()
+        var Mood = await getMoodPromise;
+        console.log(Mood);
+    }
+
+    // getting the input and return the value
+    async function setMood() {
+        let mood = document.getElementById("mood").value;
+        setMoodPromise = MoodContract.setMood(mood);
+        await setMoodPromise;
+    }
+</script>
+
+
+</html>
