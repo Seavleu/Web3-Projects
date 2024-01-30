@@ -1,1 +1,2 @@
-# Web3-Projects
+# Web3-Projects - Practicing
+
